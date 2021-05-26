@@ -1,0 +1,208 @@
+﻿@model Model.ViewModel.PostsVM
+@{
+    ViewBag.Title = "Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script>
+    // Reply box popup JS
+    $(document).ready(function () {
+        $(".reply-popup").click(function () {
+            $(".reply-box").toggle();
+        });
+    });
+</script>
+@section Slider{
+    <!-- banner-2 -->
+    <div class="page-head_agile_info_w3l">
+    </div>
+    <!-- //banner-2 -->
+    <!-- page -->
+    <div class="services-breadcrumb">
+        <div class="agile_inner_breadcrumb">
+            <div class="container">
+                <ul class="w3_short">
+                    <li>
+                        <a href="index.html">Home</a>
+                        <i>|</i>
+                    </li>
+                    <li>Detail Content</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- //page -->
+}
+<div class="ads-grid py-sm-5 py-4">
+    <div class="container py-xl-4 py-lg-2">
+        <!-- tittle heading -->
+        <h3 class="tittle-w3l text-center mb-lg-5 mb-sm-4 mb-3">
+            <span>M</span>obiles
+            <span>&</span>
+            <span>C</span>omputers
+        </h3>
+        <!-- //tittle heading -->
+        <div class="row">
+            <!-- product left -->
+            <div class="agileinfo-ads-display col-lg-9">
+                <div class="wrapper">
+                    <!-- Post Content Column -->
+                    <div>
+                        <!-- Title -->
+                        <h1 class="mt-4">@Model.Name</h1>
+
+                        <!-- Author -->
+                        <p class="lead">
+                            by
+                            <a href="#">@Model.Author</a>
+                        </p>
+
+                        <hr>
+
+                        <!-- Date/Time -->
+                        <p>Posted on January 1, 2019 at 12:00 PM</p>
+
+                        <hr>
+
+                        <!-- Preview Image -->
+                        <img class="img-fluid rounded"
+                             src="~/Assets/Client/images/win10_purple.jpg" alt="">
+
+                        <hr>
+
+                        <!-- Post Content -->
+                        <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus, vero, obcaecati, aut, error quam sapiente nemo saepe quibusdam sit excepturi nam quia corporis eligendi eos magni recusandae laborum minus inventore?</p>
+
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut, tenetur natus doloremque laborum quos iste ipsum rerum obcaecati impedit odit illo dolorum ab tempora nihil dicta earum fugiat. Temporibus, voluptatibus.</p>
+
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, doloribus, dolorem iusto blanditiis unde eius illum consequuntur neque dicta incidunt ullam ea hic porro optio ratione repellat perspiciatis. Enim, iure!</p>
+
+                        <blockquote class="blockquote">
+                            <p class="mb-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+                            <footer class="blockquote-footer">
+                                Someone famous in
+                                <cite title="Source Title">Source Title</cite>
+                            </footer>
+                        </blockquote>
+
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Error, nostrum, aliquid, animi, ut quas placeat totam sunt tempora commodi nihil ullam alias modi dicta saepe minima ab quo voluptatem obcaecati?</p>
+
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum, dolor quis. Sunt, ut, explicabo, aliquam tenetur ratione tempore quidem voluptates cupiditate voluptas illo saepe quaerat numquam recusandae? Qui, necessitatibus, est!</p>
+
+                        <hr>
+
+                        <!-- -->
+                        <!-- Comments Form -->
+                        <div class="card my-4" id="@string.Format("{0}_{1}","commentsBlock", Model.PostID)">
+                            <h5 class="card-header">Leave a Comment:</h5>
+                            <div class="card-body">
+
+                                <div class="form-group">
+                                    <textarea class="form-control" rows="3" id="@string.Format("{0}_{1}", "comment", Model.PostID)"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-outline-success addComment" data-id="@Model.PostID">Submit</button>
+
+                            </div>
+                        </div>
+
+                        <div class="panel-footer">
+                            <button type="button" class="btn btn-success Comment" data-id="@Model.PostID" value="Comment">
+                                <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Comment
+                            </button>
+                        </div>
+                        <!-- -->
+
+                    </div>
+                </div>
+            </div>
+            @Html.Action("ContentTag", "Content", Model.PostID)
+            <!-- //product left -->
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+
+    <script type="text/javascript">
+
+
+        $(document).ready(function () {
+
+
+            //Click Comment
+            $('.Comment').on('click', function () {
+
+                var id = $(this).attr("data-id");
+                var allCommentsArea = $('<div>').addClass('allComments_' + id);
+
+                //function that allow us to get all comments related to post id
+                $.ajax({
+
+                    type: 'GET',
+                    url: '@Url.Action("GetComments", "Comment")',
+                    data: { postId: id },
+                    success: function (response) {
+
+                        if ($('div').hasClass('allComments_' + id + ''))
+                        {
+                            $('div[class=allComments_' + id + ']').remove();
+                        }
+                        //console.log(response);
+
+
+                        allCommentsArea.html(response);
+                        allCommentsArea.appendTo('#commentsBlock_' + id);
+                    },
+                    error: function (response) {
+                        alert('Sorry: Comments cannot be loaded !');
+                    }
+                })
+
+            });
+
+            //Add New Comment
+            $('.addComment').on('click', function () {
+
+                var postId = $(this).attr('data-id');
+                var commentMsg = $('#comment_' + postId).val();
+                var dateTimeNow = new Date();
+
+                //alert('Hello');
+                var comment = {
+                    CommentMsg: commentMsg,
+                    CommentedDate: dateTimeNow.toLocaleString()
+                };
+
+                $.ajax({
+
+                    type: 'POST',
+                    url: '@Url.Action("AddComment", "Comment")',
+                    data: { comment, postId },
+                    success: function (response) {
+                        if (response.status) {
+                            $('div[class=allComments_' + postId + ']').remove();
+
+                            var allCommentsArea = $('<div>').addClass('allComments_' + postId);
+                            allCommentsArea.html(response);
+
+                            allCommentsArea.appendTo('#commentsBlock_' + postId);
+                        }
+                        else {
+                            window.location.href = "/User/Login";
+                        }
+                    },
+                    error: function (response) {
+                        alert('Sorry: Something Wrong');
+                    }
+                });
+
+            });
+
+            jQuery("time.timeago").timeago();
+
+        });
+
+    </script>
+
+
+}  
